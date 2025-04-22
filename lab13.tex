@@ -121,6 +121,7 @@ As you can see, the potential error is essentially zero.\\
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1} 
 \end{knitrout}
+As you can see, the error is essentially zero when the magnitude of the t statistic is between 5 and 10. This is because small shifts don't matter very much when the magnitude of the t statistic is so large. As the magnitude of t gets smaller, the magnitude of the error begins to increase towards -0.026. However, between t values of roughly -1 and 1, the error gets a little smaller (approaches -0.013). This is because there is an inflection point somehwere near 1 and -1. \\
   \item Suppose we wanted to have a tail probability within 10\% of the desired
   $\alpha=0.05$. Recall we did a left-tailed test using the further data.
   How large of a sample size would we need? That is, we need
@@ -128,6 +129,20 @@ As you can see, the potential error is essentially zero.\\
   \[0.10 \alpha  \stackrel{set}{=} \underbrace{\frac{\text{skew}}{\sqrt{n}} \frac{(2t^2+1)}{6} f_Z(t)}_{\textrm{error}},\]
   which yields
   \[ n = \left(\frac{\text{skew}}{6(0.10\alpha)} (2t^2 + 1) f_Z(t)\right)^2.\]
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{alpha} \hlkwb{=} \hlnum{0.05}
+\hldef{t} \hlkwb{=} \hlkwd{qnorm}\hldef{(alpha)} \hlcom{#t statistic at alpha = 0.05}
+\hlcom{#required sample size to get a tail probability within 10% of alpha}
+\hldef{(n.required} \hlkwb{=} \hldef{((}\hlkwd{skewness}\hldef{(far.vec)}\hlopt{/}\hldef{(}\hlnum{6}\hlopt{*}\hlnum{.1}\hlopt{*}\hldef{alpha))}\hlopt{*}\hldef{((}\hlnum{2}\hlopt{*}\hldef{t}\hlopt{^}\hlnum{2} \hlopt{+} \hlnum{1}\hldef{))}\hlopt{*}\hlkwd{dnorm}\hldef{(t))}\hlopt{^}\hlnum{2}\hldef{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 520.8876
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+It would require a sample size of 521 in order to get a tail probability within 10\% of alpha (0.05).\\
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

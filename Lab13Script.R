@@ -12,6 +12,7 @@ far.t.stat = (mean(far.vec) - mu0)/(sd(far.vec)/sqrt(n)) #far t statistic
 far.pdf = dnorm(far.t.stat)
 far.error = (skewness(far.vec)/sqrt(n))*((2*far.t.stat^2 + 1)/6)*far.pdf
 
+#part b
 t.stat = seq(-10,10, by = 0.01)
 error.vec = (skewness(far.vec)/sqrt(n))*((2*t.stat^2 + 1)/6)*dnorm(t.stat)
 error.dat = data.frame(t = t.stat, error = error.vec)
@@ -19,3 +20,9 @@ error.plot = ggplot(data = error.dat, aes(x = t, y = error))+
   geom_line(color = "red") +
   labs(title = "Error with respect to t statistic for further data")
 error.plot
+
+#part c
+alpha = 0.05
+t = qnorm(alpha) #t statistic at alpha = 0.05
+#required sample size to get a tail probability within 10% of alpha
+n.required = ((skewness(far.vec)/(6*.1*alpha))*((2*t^2 + 1))*dnorm(t))^2
