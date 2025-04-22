@@ -26,3 +26,46 @@ alpha = 0.05
 t = qnorm(alpha) #t statistic at alpha = 0.05
 #required sample size to get a tail probability within 10% of alpha
 n.required = ((skewness(far.vec)/(6*.1*alpha))*((2*t^2 + 1))*dnorm(t))^2
+
+#question 2
+
+#part a
+far.vec = data$further
+close.vec = data$closer
+diff.vec = data$diff
+R = 10000 #simulations
+n = 25
+far.resamples = tibble(t.stats = rep(NA, R))
+close.resamples = tibble(t.stats = rep(NA, R))
+diff.resamples = tibble(t.stats = rep(NA, R))
+#resamples for all 3 types of data
+for(i in 1:R){
+  curr.far.resample = sample(far.vec,
+                          size = n,
+                          replace = T)
+  curr.close.resample = sample(close.vec,
+                             size = n,
+                             replace = T)
+  curr.diff.resample = sample(diff.vec,
+                             size = n,
+                             replace = T)
+  #resampled t statistics for close, far, and diff data
+  far.resamples$t.stats[i] = mean(curr.far.resample)/(sd(far.vec)/sqrt(n))
+  close.resamples$t.stats[i] = mean(curr.close.resample)/(sd(close.vec)/sqrt(n))
+  diff.resamples$t.stats[i] = mean(curr.diff.resample)/(sd(diff.vec)/sqrt(n))
+}
+#shifted resamples
+resamples.null.far = far.resamples$t.stats - mean(far.resamples$t.stats)
+resamples.null.close = close.resamples$t.stats - mean(close.resamples$t.stats)
+resamples.null.diff = diff.resamples$t.stats - mean(diff.resamples$t.stats)
+#mean of shifted resamples
+mean(resamples.null.far)
+mean(resamples.null.close)
+mean(resamples.null.diff)
+
+#part b
+mean(resamples.null.far <= mean(far.resamples$t.stats))
+mean(resamples.null.close >= mean(close.resamples$t.stats))
+mean(resamples.null.diff <= mean(diff.resamples$t.stats))
+
+

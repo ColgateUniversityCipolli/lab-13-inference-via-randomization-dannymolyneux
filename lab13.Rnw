@@ -46,7 +46,8 @@ mu0 = 0
 n = 25
 far.t.stat = (mean(far.vec) - mu0)/(sd(far.vec)/sqrt(n)) #far t statistic
 far.pdf = dnorm(far.t.stat) #pdf using the far t statistic
-(far.error = (skewness(far.vec)/sqrt(n))*((2*far.t.stat^2 + 1)/6)*far.pdf) #potential error for further data
+#potential error for further data
+(far.error = (skewness(far.vec)/sqrt(n))*((2*far.t.stat^2 + 1)/6)*far.pdf) 
 @
 As you can see, the potential error is essentially zero.\\
   \item Compute the error for $t$ statistics from -10 to 10 and plot a line
@@ -79,7 +80,7 @@ It would require a sample size of 521 in order to get a tail probability within 
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 3
+% Question 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the
@@ -95,6 +96,41 @@ sampling distribution of the $T$ statistic:
   resamples shifted to ensure they are consistent with the null hypotheses at the average 
   (i.e., here ensure the shifted resamples are 0 on average, corresponding
   to $t=0$, for each case). 
+<<message=F, warning=F>>=
+far.vec = data$further
+close.vec = data$closer
+diff.vec = data$diff
+R = 10000 #simulations
+n = 25
+far.resamples = tibble(t.stats = rep(NA, R))
+close.resamples = tibble(t.stats = rep(NA, R))
+diff.resamples = tibble(t.stats = rep(NA, R))
+#resamples for all 3 types of data
+for(i in 1:R){
+  curr.far.resample = sample(far.vec,
+                          size = n,
+                          replace = T)
+  curr.close.resample = sample(close.vec,
+                             size = n,
+                             replace = T)
+  curr.diff.resample = sample(diff.vec,
+                             size = n,
+                             replace = T)
+  #resampled t statistics for close, far, and diff data
+  far.resamples$t.stats[i] = mean(curr.far.resample)/(sd(far.vec)/sqrt(n))
+  close.resamples$t.stats[i] = mean(curr.close.resample)/(sd(close.vec)/sqrt(n))
+  diff.resamples$t.stats[i] = mean(curr.diff.resample)/(sd(diff.vec)/sqrt(n))
+}
+#shifted resamples
+resamples.null.far = far.resamples$t.stats - mean(far.resamples$t.stats)
+resamples.null.close = close.resamples$t.stats - mean(close.resamples$t.stats)
+resamples.null.diff = diff.resamples$t.stats - mean(diff.resamples$t.stats)
+#mean of shifted resamples
+mean(resamples.null.far)
+mean(resamples.null.close)
+mean(resamples.null.diff)
+@
+You can see that after shifting all of the resampled data by their mean, to show what the distribution would look like if the null was true, the means of the shifted data are all roughly zero.\\
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
   How do these compare to the $t$-test $p$-values?
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
@@ -104,7 +140,7 @@ sampling distribution of the $T$ statistic:
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 4
+% Question 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the

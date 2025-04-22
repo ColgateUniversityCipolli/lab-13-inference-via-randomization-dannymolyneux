@@ -96,7 +96,8 @@ for the the further observations.
 \hldef{n} \hlkwb{=} \hlnum{25}
 \hldef{far.t.stat} \hlkwb{=} \hldef{(}\hlkwd{mean}\hldef{(far.vec)} \hlopt{-} \hldef{mu0)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))} \hlcom{#far t statistic}
 \hldef{far.pdf} \hlkwb{=} \hlkwd{dnorm}\hldef{(far.t.stat)} \hlcom{#pdf using the far t statistic}
-\hldef{(far.error} \hlkwb{=} \hldef{(}\hlkwd{skewness}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}\hlopt{*}\hldef{((}\hlnum{2}\hlopt{*}\hldef{far.t.stat}\hlopt{^}\hlnum{2} \hlopt{+} \hlnum{1}\hldef{)}\hlopt{/}\hlnum{6}\hldef{)}\hlopt{*}\hldef{far.pdf)} \hlcom{#potential error for further data}
+\hlcom{#potential error for further data}
+\hldef{(far.error} \hlkwb{=} \hldef{(}\hlkwd{skewness}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}\hlopt{*}\hldef{((}\hlnum{2}\hlopt{*}\hldef{far.t.stat}\hlopt{^}\hlnum{2} \hlopt{+} \hlnum{1}\hldef{)}\hlopt{/}\hlnum{6}\hldef{)}\hlopt{*}\hldef{far.pdf)}
 \end{alltt}
 \begin{verbatim}
 ## [1] -1.226006e-13
@@ -146,7 +147,7 @@ It would require a sample size of 521 in order to get a tail probability within 
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 3
+% Question 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the
@@ -162,6 +163,57 @@ sampling distribution of the $T$ statistic:
   resamples shifted to ensure they are consistent with the null hypotheses at the average 
   (i.e., here ensure the shifted resamples are 0 on average, corresponding
   to $t=0$, for each case). 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{far.vec} \hlkwb{=} \hldef{data}\hlopt{$}\hldef{further}
+\hldef{close.vec} \hlkwb{=} \hldef{data}\hlopt{$}\hldef{closer}
+\hldef{diff.vec} \hlkwb{=} \hldef{data}\hlopt{$}\hldef{diff}
+\hldef{R} \hlkwb{=} \hlnum{10000} \hlcom{#simulations}
+\hldef{n} \hlkwb{=} \hlnum{25}
+\hldef{far.resamples} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{t.stats} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hldef{close.resamples} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{t.stats} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hldef{diff.resamples} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{t.stats} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hlcom{#resamples for all 3 types of data}
+\hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+  \hldef{curr.far.resample} \hlkwb{=} \hlkwd{sample}\hldef{(far.vec,}
+                          \hlkwc{size} \hldef{= n,}
+                          \hlkwc{replace} \hldef{= T)}
+  \hldef{curr.close.resample} \hlkwb{=} \hlkwd{sample}\hldef{(close.vec,}
+                             \hlkwc{size} \hldef{= n,}
+                             \hlkwc{replace} \hldef{= T)}
+  \hldef{curr.diff.resample} \hlkwb{=} \hlkwd{sample}\hldef{(diff.vec,}
+                             \hlkwc{size} \hldef{= n,}
+                             \hlkwc{replace} \hldef{= T)}
+  \hlcom{#resampled t statistics for close, far, and diff data}
+  \hldef{far.resamples}\hlopt{$}\hldef{t.stats[i]} \hlkwb{=} \hlkwd{mean}\hldef{(curr.far.resample)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}
+  \hldef{close.resamples}\hlopt{$}\hldef{t.stats[i]} \hlkwb{=} \hlkwd{mean}\hldef{(curr.close.resample)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(close.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}
+  \hldef{diff.resamples}\hlopt{$}\hldef{t.stats[i]} \hlkwb{=} \hlkwd{mean}\hldef{(curr.diff.resample)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(diff.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}
+\hldef{\}}
+\hlcom{#shifted resamples}
+\hldef{resamples.null.far} \hlkwb{=} \hldef{far.resamples}\hlopt{$}\hldef{t.stats} \hlopt{-} \hlkwd{mean}\hldef{(far.resamples}\hlopt{$}\hldef{t.stats)}
+\hldef{resamples.null.close} \hlkwb{=} \hldef{close.resamples}\hlopt{$}\hldef{t.stats} \hlopt{-} \hlkwd{mean}\hldef{(close.resamples}\hlopt{$}\hldef{t.stats)}
+\hldef{resamples.null.diff} \hlkwb{=} \hldef{diff.resamples}\hlopt{$}\hldef{t.stats} \hlopt{-} \hlkwd{mean}\hldef{(diff.resamples}\hlopt{$}\hldef{t.stats)}
+\hlcom{#mean of shifted resamples}
+\hlkwd{mean}\hldef{(resamples.null.far)}
+\end{alltt}
+\begin{verbatim}
+## [1] -1.688871e-16
+\end{verbatim}
+\begin{alltt}
+\hlkwd{mean}\hldef{(resamples.null.close)}
+\end{alltt}
+\begin{verbatim}
+## [1] -3.936351e-16
+\end{verbatim}
+\begin{alltt}
+\hlkwd{mean}\hldef{(resamples.null.diff)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3.467046e-16
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
   How do these compare to the $t$-test $p$-values?
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
@@ -171,7 +223,7 @@ sampling distribution of the $T$ statistic:
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Question 4
+% Question 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Complete the following steps to revisit the analyses from lab 11 using the
