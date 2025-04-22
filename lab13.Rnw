@@ -52,7 +52,16 @@ As you can see, the potential error is essentially zero.\\
   \item Compute the error for $t$ statistics from -10 to 10 and plot a line
   that shows the error across $t$. Continue to use the skewness and 
   the sample size for the zebra finch further data.
-
+<<message=F, warning=F>>=
+t.stat = seq(-10,10, by = 0.01)
+error.vec = (skewness(far.vec)/sqrt(n))*((2*t.stat^2 + 1)/6)*dnorm(t.stat)
+error.dat = data.frame(t = t.stat, error = error.vec)
+error.plot = ggplot(data = error.dat, aes(x = t, y = error))+
+  geom_line(color = "red") +
+  labs(title = "Error with respect to t statistic for further data")
+error.plot
+@
+As you can see, the error is essentially zero when the magnitude of the t statistic is between 5 and 10. This is because small shifts don't matter very much when the magnitude of the t statistic is so large. As the magnitude of t gets smaller, the magnitude of the error begins to increase towards -0.026. However, between t values of roughly -1 and 1, the error gets a little smaller (approaches -0.013). This is because there is an inflection point somehwere near 1 and -1. \\
   \item Suppose we wanted to have a tail probability within 10\% of the desired
   $\alpha=0.05$. Recall we did a left-tailed test using the further data.
   How large of a sample size would we need? That is, we need

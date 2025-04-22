@@ -103,11 +103,24 @@ for the the further observations.
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-As you can see, the potential error is essentially zero.
+As you can see, the potential error is essentially zero.\\
   \item Compute the error for $t$ statistics from -10 to 10 and plot a line
   that shows the error across $t$. Continue to use the skewness and 
   the sample size for the zebra finch further data.
-
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{t.stat} \hlkwb{=} \hlkwd{seq}\hldef{(}\hlopt{-}\hlnum{10}\hldef{,}\hlnum{10}\hldef{,} \hlkwc{by} \hldef{=} \hlnum{0.01}\hldef{)}
+\hldef{error.vec} \hlkwb{=} \hldef{(}\hlkwd{skewness}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))}\hlopt{*}\hldef{((}\hlnum{2}\hlopt{*}\hldef{t.stat}\hlopt{^}\hlnum{2} \hlopt{+} \hlnum{1}\hldef{)}\hlopt{/}\hlnum{6}\hldef{)}\hlopt{*}\hlkwd{dnorm}\hldef{(t.stat)}
+\hldef{error.dat} \hlkwb{=} \hlkwd{data.frame}\hldef{(}\hlkwc{t} \hldef{= t.stat,} \hlkwc{error} \hldef{= error.vec)}
+\hldef{error.plot} \hlkwb{=} \hlkwd{ggplot}\hldef{(}\hlkwc{data} \hldef{= error.dat,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= t,} \hlkwc{y} \hldef{= error))}\hlopt{+}
+  \hlkwd{geom_line}\hldef{(}\hlkwc{color} \hldef{=} \hlsng{"red"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Error with respect to t statistic for further data"}\hldef{)}
+\hldef{error.plot}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1} 
+\end{knitrout}
   \item Suppose we wanted to have a tail probability within 10\% of the desired
   $\alpha=0.05$. Recall we did a left-tailed test using the further data.
   How large of a sample size would we need? That is, we need
