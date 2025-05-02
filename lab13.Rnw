@@ -145,9 +145,42 @@ diff.t.stat = (mean(diff.vec) - mu0)/(sd(diff.vec)/sqrt(n)) #far t statistic
 As you can see, the p-values for all three tests are zero. For the t-tests, the p-values were very very close to zero. The reason these p-values are actually zero rather than approximately, is because I calculated the proportion of shifted observations that were as/more extreme than their corresponding t-statistic. Because of how large the magnitude of the three t-statistics are, non e of the shifted observations were as extreme, resulting in p-values of zero. So although the p-values were tiny for the t-tests, the bootstrap procedure resulted in even smaller ones.
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
   Note this value approximates $t_{0.05, n-1}$. Compare these values in each case.
-
+<<message=F, warning=F>>=
+(far.5th.percentile = quantile(resamples.null.far, 0.05))
+(close.5th.percentile = quantile(resamples.null.close, 0.05))
+(diff.5th.percentile = quantile(resamples.null.diff, 0.05))
+@
+The first thing I notice here is that these values are all relatively close to the 5th percentile of standard normal distribution, which is -1.64. For the far data, the 5th percentile is the most negative, meaning more extreme values are required to reject the null. It makes sense that these values are all pretty similar given that they all have very similar p values (the same for bootstrap).
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
-  compare to the $t$-test confidence intervals?
+  compare to the $t$-test confidence intervals? 
+<<message=F, warning=F>>=
+library(boot)
+boot.mean <- function(d, i){
+  mean(d[i])
+}
+#bootstrap confidence intervals
+boots.far <- boot(data = far.vec,
+              statistic = boot.mean,
+              R = R)
+boot.far.ci = boot.ci(boots.far, type="bca")
+
+boot.far.ci$bca[4:5]
+
+boots.close <- boot(data = close.vec,
+                  statistic = boot.mean,
+                  R = R)
+boot.close.ci = boot.ci(boots.close, type="bca")
+
+boot.close.ci$bca[4:5]
+
+boots.diff <- boot(data = diff.vec,
+                  statistic = boot.mean,
+                  R = R)
+boot.diff.ci = boot.ci(boots.diff, type="bca")
+
+boot.diff.ci$bca[4:5]
+@
+These confidence intervals are all similar to their corresponding t-test confidence intervals. The bootstrap intervals are actually slightly narrower, which likely means that the resampled sampling distributions are less variable than the assumed t distribution (from the t-test). But all in all, the intervals are quite similar, and still exclude zero, suggesting a difference. 
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

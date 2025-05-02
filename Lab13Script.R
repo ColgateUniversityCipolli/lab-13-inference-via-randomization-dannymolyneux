@@ -72,4 +72,35 @@ diff.t.stat = (mean(diff.vec) - mu0)/(sd(diff.vec)/sqrt(n)) #far t statistic
 (close.p = mean(resamples.null.close >= close.t.stat))
 (diff.p = mean(resamples.null.diff >= abs(diff.t.stat)) + mean(resamples.null.diff <= -abs(diff.t.stat)))
 
+#part c
+#5th percentiles of shifted resamples
+(far.5th.percentile = quantile(resamples.null.far, 0.05))
+(close.5th.percentile = quantile(resamples.null.close, 0.05))
+(diff.5th.percentile = quantile(resamples.null.diff, 0.05))
 
+#part d
+library(boot)
+boot.mean <- function(d, i){
+  mean(d[i])
+}
+#bootstrap confidence intervals
+boots.far <- boot(data = far.vec,
+              statistic = boot.mean,
+              R = R)
+boot.far.ci = boot.ci(boots.far, type="bca")
+
+boot.far.ci$bca[4:5]
+
+boots.close <- boot(data = close.vec,
+                  statistic = boot.mean,
+                  R = R)
+boot.close.ci = boot.ci(boots.close, type="bca")
+
+boot.close.ci$bca[4:5]
+
+boots.diff <- boot(data = diff.vec,
+                  statistic = boot.mean,
+                  R = R)
+boot.diff.ci = boot.ci(boots.diff, type="bca")
+
+boot.diff.ci$bca[4:5]

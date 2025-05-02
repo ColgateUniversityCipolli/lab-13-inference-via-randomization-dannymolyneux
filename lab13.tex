@@ -198,29 +198,124 @@ sampling distribution of the $T$ statistic:
 \hlkwd{mean}\hldef{(resamples.null.far)}
 \end{alltt}
 \begin{verbatim}
-## [1] -1.710632e-16
+## [1] -4.790612e-18
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.close)}
 \end{alltt}
 \begin{verbatim}
-## [1] -8.495343e-16
+## [1] 2.449596e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.diff)}
 \end{alltt}
 \begin{verbatim}
-## [1] -1.705414e-16
+## [1] 8.4645e-16
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 You can see that after shifting all of the resampled data by their mean, to show what the distribution would look like if the null was true, the means of the shifted data are all roughly zero.\\
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
   How do these compare to the $t$-test $p$-values?
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{far.t.stat} \hlkwb{=} \hldef{(}\hlkwd{mean}\hldef{(far.vec)} \hlopt{-} \hldef{mu0)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(far.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))} \hlcom{#far t statistic}
+\hldef{close.t.stat} \hlkwb{=} \hldef{(}\hlkwd{mean}\hldef{(close.vec)} \hlopt{-} \hldef{mu0)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(close.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))} \hlcom{#far t statistic}
+\hldef{diff.t.stat} \hlkwb{=} \hldef{(}\hlkwd{mean}\hldef{(diff.vec)} \hlopt{-} \hldef{mu0)}\hlopt{/}\hldef{(}\hlkwd{sd}\hldef{(diff.vec)}\hlopt{/}\hlkwd{sqrt}\hldef{(n))} \hlcom{#far t statistic}
+\hlcom{#p values for each test}
+\hldef{(far.p} \hlkwb{=} \hlkwd{mean}\hldef{(resamples.null.far} \hlopt{<=} \hldef{far.t.stat))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(close.p} \hlkwb{=} \hlkwd{mean}\hldef{(resamples.null.close} \hlopt{>=} \hldef{close.t.stat))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.p} \hlkwb{=} \hlkwd{mean}\hldef{(resamples.null.diff} \hlopt{>=} \hlkwd{abs}\hldef{(diff.t.stat))} \hlopt{+} \hlkwd{mean}\hldef{(resamples.null.diff} \hlopt{<= -}\hlkwd{abs}\hldef{(diff.t.stat)))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+As you can see, the p-values for all three tests are zero. For the t-tests, the p-values were very very close to zero. The reason these p-values are actually zero rather than approximately, is because I calculated the proportion of shifted observations that were as/more extreme than their corresponding t-statistic. Because of how large the magnitude of the three t-statistics are, non e of the shifted observations were as extreme, resulting in p-values of zero. So although the p-values were tiny for the t-tests, the bootstrap procedure resulted in even smaller ones.
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
   Note this value approximates $t_{0.05, n-1}$. Compare these values in each case.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{(far.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.far,} \hlnum{0.05}\hldef{))}
+\end{alltt}
+\begin{verbatim}
+##        5% 
+## -1.669035
+\end{verbatim}
+\begin{alltt}
+\hldef{(close.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.close,} \hlnum{0.05}\hldef{))}
+\end{alltt}
+\begin{verbatim}
+##        5% 
+## -1.590285
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.diff,} \hlnum{0.05}\hldef{))}
+\end{alltt}
+\begin{verbatim}
+##        5% 
+## -1.550253
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
   compare to the $t$-test confidence intervals?
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hldef{(boot)}
+\hldef{boot.mean} \hlkwb{<-} \hlkwa{function}\hldef{(}\hlkwc{d}\hldef{,} \hlkwc{i}\hldef{)\{}
+  \hlkwd{mean}\hldef{(d[i])}
+\hldef{\}}
+\hlcom{#bootstrap confidence intervals}
+\hldef{boots.far} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= far.vec,}
+              \hlkwc{statistic} \hldef{= boot.mean,}
+              \hlkwc{R} \hldef{= R)}
+\hldef{boot.far.ci} \hlkwb{=} \hlkwd{boot.ci}\hldef{(boots.far,} \hlkwc{type}\hldef{=}\hlsng{"bca"}\hldef{)}
+
+\hldef{boot.far.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
+\end{alltt}
+\begin{verbatim}
+## [1] -0.2609418 -0.1605735
+\end{verbatim}
+\begin{alltt}
+\hldef{boots.close} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= close.vec,}
+                  \hlkwc{statistic} \hldef{= boot.mean,}
+                  \hlkwc{R} \hldef{= R)}
+\hldef{boot.close.ci} \hlkwb{=} \hlkwd{boot.ci}\hldef{(boots.close,} \hlkwc{type}\hldef{=}\hlsng{"bca"}\hldef{)}
+
+\hldef{boot.close.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.1220345 0.1941845
+\end{verbatim}
+\begin{alltt}
+\hldef{boots.diff} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= diff.vec,}
+                  \hlkwc{statistic} \hldef{= boot.mean,}
+                  \hlkwc{R} \hldef{= R)}
+\hldef{boot.diff.ci} \hlkwb{=} \hlkwd{boot.ci}\hldef{(boots.diff,} \hlkwc{type}\hldef{=}\hlsng{"bca"}\hldef{)}
+
+\hldef{boot.diff.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.2858236 0.4532349
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
