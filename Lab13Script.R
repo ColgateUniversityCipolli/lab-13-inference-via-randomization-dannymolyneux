@@ -64,8 +64,12 @@ mean(resamples.null.close)
 mean(resamples.null.diff)
 
 #part b
-mean(resamples.null.far <= mean(far.resamples$t.stats))
-mean(resamples.null.close >= mean(close.resamples$t.stats))
-mean(resamples.null.diff <= mean(diff.resamples$t.stats))
+far.t.stat = (mean(far.vec) - mu0)/(sd(far.vec)/sqrt(n)) #far t statistic
+close.t.stat = (mean(close.vec) - mu0)/(sd(close.vec)/sqrt(n)) #far t statistic
+diff.t.stat = (mean(diff.vec) - mu0)/(sd(diff.vec)/sqrt(n)) #far t statistic
+#p values for each test
+(far.p = mean(resamples.null.far <= far.t.stat))
+(close.p = mean(resamples.null.close >= close.t.stat))
+(diff.p = mean(resamples.null.diff >= abs(diff.t.stat)) + mean(resamples.null.diff <= -abs(diff.t.stat)))
 
 

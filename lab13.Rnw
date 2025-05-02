@@ -133,8 +133,19 @@ mean(resamples.null.diff)
 You can see that after shifting all of the resampled data by their mean, to show what the distribution would look like if the null was true, the means of the shifted data are all roughly zero.\\
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
   How do these compare to the $t$-test $p$-values?
+<<message=F, warning=F>>=
+far.t.stat = (mean(far.vec) - mu0)/(sd(far.vec)/sqrt(n)) #far t statistic
+close.t.stat = (mean(close.vec) - mu0)/(sd(close.vec)/sqrt(n)) #far t statistic
+diff.t.stat = (mean(diff.vec) - mu0)/(sd(diff.vec)/sqrt(n)) #far t statistic
+#p values for each test
+(far.p = mean(resamples.null.far <= far.t.stat))
+(close.p = mean(resamples.null.close >= close.t.stat))
+(diff.p = mean(resamples.null.diff >= abs(diff.t.stat)) + mean(resamples.null.diff <= -abs(diff.t.stat)))
+@
+As you can see, the p-values for all three tests are zero. For the t-tests, the p-values were very very close to zero. The reason these p-values are actually zero rather than approximately, is because I calculated the proportion of shifted observations that were as/more extreme than their corresponding t-statistic. Because of how large the magnitude of the three t-statistics are, non e of the shifted observations were as extreme, resulting in p-values of zero. So although the p-values were tiny for the t-tests, the bootstrap procedure resulted in even smaller ones.
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
   Note this value approximates $t_{0.05, n-1}$. Compare these values in each case.
+
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
   compare to the $t$-test confidence intervals?
 \end{enumerate}

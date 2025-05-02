@@ -198,22 +198,23 @@ sampling distribution of the $T$ statistic:
 \hlkwd{mean}\hldef{(resamples.null.far)}
 \end{alltt}
 \begin{verbatim}
-## [1] -1.688871e-16
+## [1] -1.710632e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.close)}
 \end{alltt}
 \begin{verbatim}
-## [1] -3.936351e-16
+## [1] -8.495343e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.diff)}
 \end{alltt}
 \begin{verbatim}
-## [1] 3.467046e-16
+## [1] -1.705414e-16
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+You can see that after shifting all of the resampled data by their mean, to show what the distribution would look like if the null was true, the means of the shifted data are all roughly zero.\\
   \item Compute the bootstrap $p$-value for each test using the shifted resamples. 
   How do these compare to the $t$-test $p$-values?
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
