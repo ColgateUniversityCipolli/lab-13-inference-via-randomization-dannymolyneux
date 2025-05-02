@@ -104,3 +104,46 @@ boots.diff <- boot(data = diff.vec,
 boot.diff.ci = boot.ci(boots.diff, type="bca")
 
 boot.diff.ci$bca[4:5]
+
+#Question 3: randomization
+
+#part a
+R = 10000
+n = 25
+far.rand = tibble(xbars = rep(NA, R))
+close.rand = tibble(xbars = rep(NA, R))
+diff.rand = tibble(xbars = rep(NA, R))
+# RANDOMIZE / SHUFFLE
+for(i in 1:R){
+  curr.far.rand <- far.vec *
+    sample(x = c(-1, 1),
+           size = n,
+           replace = T)
+  curr.close.rand <- close.vec *
+    sample(x = c(-1, 1),
+           size = n,
+           replace = T)
+  curr.diff.rand <- diff.vec *
+    sample(x = c(-1, 1),
+           size = n,
+           replace = T)
+  
+  far.rand$xbars[i] <- mean(curr.far.rand)
+  close.rand$xbars[i] <- mean(curr.close.rand)
+  diff.rand$xbars[i] <- mean(curr.diff.rand)
+}
+
+#part b: p-value
+
+mu0 = 0
+delta.diff <- abs(mean(diff.vec) - mu0)
+low.diff <- mu0 - delta.diff
+high.diff <- mu0 + delta.diff
+#p-values
+far.p = mean(far.rand$xbars <= mean(far.vec))
+close.p = mean(close.rand$xbars >= mean(close.vec))
+diff.p = mean(diff.rand$xbars <= low.diff) + mean(diff.rand$xbars >= high.diff)
+
+
+
+

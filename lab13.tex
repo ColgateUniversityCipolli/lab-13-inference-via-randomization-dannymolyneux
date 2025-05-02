@@ -198,19 +198,19 @@ sampling distribution of the $T$ statistic:
 \hlkwd{mean}\hldef{(resamples.null.far)}
 \end{alltt}
 \begin{verbatim}
-## [1] -4.790612e-18
+## [1] 8.915091e-18
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.close)}
 \end{alltt}
 \begin{verbatim}
-## [1] 2.449596e-16
+## [1] -5.88829e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.diff)}
 \end{alltt}
 \begin{verbatim}
-## [1] 8.4645e-16
+## [1] 8.519963e-16
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -253,27 +253,27 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.669035
+## -1.691538
 \end{verbatim}
 \begin{alltt}
 \hldef{(close.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.close,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
-##        5% 
-## -1.590285
+##       5% 
+## -1.58798
 \end{verbatim}
 \begin{alltt}
 \hldef{(diff.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.diff,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.550253
+## -1.559157
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-
+The first thing I notice here is that these values are all relatively close to the 5th percentile of standard normal distribution, which is -1.64. For the far data, the 5th percentile is the most negative, meaning more extreme values are required to reject the null. It makes sense that these values are all pretty similar given that they all have very similar p values (the same for bootstrap).
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
-  compare to the $t$-test confidence intervals?
+  compare to the $t$-test confidence intervals? 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -290,7 +290,7 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \hldef{boot.far.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] -0.2609418 -0.1605735
+## [1] -0.2629151 -0.1603878
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.close} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= close.vec,}
@@ -301,7 +301,7 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \hldef{boot.close.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.1220345 0.1941845
+## [1] 0.1226662 0.1945339
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.diff} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= diff.vec,}
@@ -312,10 +312,11 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \hldef{boot.diff.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.2858236 0.4532349
+## [1] 0.2880493 0.4502331
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+These confidence intervals are all similar to their corresponding t-test confidence intervals. The bootstrap intervals are actually slightly narrower, which likely means that the resampled sampling distributions are less variable than the assumed t distribution (from the t-test). But all in all, the intervals are quite similar, and still exclude zero, suggesting a difference. 
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
