@@ -140,9 +140,9 @@ delta.diff <- abs(mean(diff.vec) - mu0)
 low.diff <- mu0 - delta.diff
 high.diff <- mu0 + delta.diff
 #p-values
-far.p = mean(far.rand$xbars <= mean(far.vec))
-close.p = mean(close.rand$xbars >= mean(close.vec))
-diff.p = mean(diff.rand$xbars <= low.diff) + mean(diff.rand$xbars >= high.diff)
+(far.p = mean(far.rand$xbars <= mean(far.vec)))
+(close.p = mean(close.rand$xbars >= mean(close.vec)))
+(diff.p = mean(diff.rand$xbars <= low.diff) + mean(diff.rand$xbars >= high.diff))
 
 
 

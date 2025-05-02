@@ -198,19 +198,19 @@ sampling distribution of the $T$ statistic:
 \hlkwd{mean}\hldef{(resamples.null.far)}
 \end{alltt}
 \begin{verbatim}
-## [1] 8.915091e-18
+## [1] 1.896719e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.close)}
 \end{alltt}
 \begin{verbatim}
-## [1] -5.88829e-16
+## [1] -2.878142e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.diff)}
 \end{alltt}
 \begin{verbatim}
-## [1] 8.519963e-16
+## [1] -5.224154e-17
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -243,7 +243,7 @@ You can see that after shifting all of the resampled data by their mean, to show
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-As you can see, the p-values for all three tests are zero. For the t-tests, the p-values were very very close to zero. The reason these p-values are actually zero rather than approximately, is because I calculated the proportion of shifted observations that were as/more extreme than their corresponding t-statistic. Because of how large the magnitude of the three t-statistics are, non e of the shifted observations were as extreme, resulting in p-values of zero. So although the p-values were tiny for the t-tests, the bootstrap procedure resulted in even smaller ones.
+As you can see, the p-values for all three tests are zero. For the t-tests, the p-values were very very close to zero. The reason these p-values are actually zero rather than approximately, is because I calculated the proportion of shifted observations that were as/more extreme than their corresponding t-statistic. Because of how large the magnitude of the three t-statistics are, none of the shifted observations were as extreme, resulting in p-values of zero. The t-test calculates the p-values as a theoretical probability. So even though the probability is very small, there is still some area under the curve. So although the p-values were tiny for the t-tests, the bootstrap procedure resulted in even smaller ones.
     \item What is the 5$^{th}$ percentile of the shifted resamples under the null hypothesis? 
   Note this value approximates $t_{0.05, n-1}$. Compare these values in each case.
 \begin{knitrout}
@@ -253,25 +253,25 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.691538
+## -1.667138
 \end{verbatim}
 \begin{alltt}
 \hldef{(close.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.close,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
-##       5% 
-## -1.58798
+##        5% 
+## -1.596498
 \end{verbatim}
 \begin{alltt}
 \hldef{(diff.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.diff,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.559157
+## -1.556945
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-The first thing I notice here is that these values are all relatively close to the 5th percentile of standard normal distribution, which is -1.64. For the far data, the 5th percentile is the most negative, meaning more extreme values are required to reject the null. It makes sense that these values are all pretty similar given that they all have very similar p values (the same for bootstrap).
+The first thing I notice here is that these values are all relatively close to the 5th percentile of standard normal distribution, which is -1.64. For the far data, the 5th percentile is the most negative, meaning more extreme values are required to reject the null. It makes sense that these values are all pretty similar given that they all have the same sample size (25), and they are all under the assumed null distribution.
   \item Compute the bootstrap confidence intervals using the resamples. How do these 
   compare to the $t$-test confidence intervals? 
 \begin{knitrout}
@@ -290,7 +290,7 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.far.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] -0.2629151 -0.1603878
+## [1] -0.2629412 -0.1597044
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.close} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= close.vec,}
@@ -301,7 +301,7 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.close.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.1226662 0.1945339
+## [1] 0.1215654 0.1937632
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.diff} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= diff.vec,}
@@ -312,11 +312,11 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.diff.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.2880493 0.4502331
+## [1] 0.2849256 0.4485000
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-These confidence intervals are all similar to their corresponding t-test confidence intervals. The bootstrap intervals are actually slightly narrower, which likely means that the resampled sampling distributions are less variable than the assumed t distribution (from the t-test). But all in all, the intervals are quite similar, and still exclude zero, suggesting a difference. 
+These confidence intervals are all similar to their corresponding t-test confidence intervals. For the most part, the bootstrap intervals are pulled in from one side, and pulled out from the other side, in relation to the t-test intervals. This is due to the skewness of the distributions. But all in all, the intervals are quite similar, and still exclude zero, suggesting a difference. 
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -328,11 +328,69 @@ randomization procedure.
 \begin{enumerate}
 \item Now, consider the zebra finch data. We do not know the generating distributions
 for the closer, further, and difference data, so perform the randomization procedure
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{R} \hlkwb{=} \hlnum{10000}
+\hldef{n} \hlkwb{=} \hlnum{25}
+\hldef{far.rand} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hldef{close.rand} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hldef{diff.rand} \hlkwb{=} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+\hlcom{# RANDOMIZE / SHUFFLE}
+\hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+  \hldef{curr.far.rand} \hlkwb{<-} \hldef{far.vec} \hlopt{*}
+    \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+           \hlkwc{size} \hldef{= n,}
+           \hlkwc{replace} \hldef{= T)}
+  \hldef{curr.close.rand} \hlkwb{<-} \hldef{close.vec} \hlopt{*}
+    \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+           \hlkwc{size} \hldef{= n,}
+           \hlkwc{replace} \hldef{= T)}
+  \hldef{curr.diff.rand} \hlkwb{<-} \hldef{diff.vec} \hlopt{*}
+    \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+           \hlkwc{size} \hldef{= n,}
+           \hlkwc{replace} \hldef{= T)}
+
+  \hldef{far.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(curr.far.rand)}
+  \hldef{close.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(curr.close.rand)}
+  \hldef{diff.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(curr.diff.rand)}
+\hldef{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
   \item Compute the randomization test $p$-value for each test.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{mu0} \hlkwb{=} \hlnum{0}
+\hldef{delta.diff} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(diff.vec)} \hlopt{-} \hldef{mu0)}
+\hldef{low.diff} \hlkwb{<-} \hldef{mu0} \hlopt{-} \hldef{delta.diff}
+\hldef{high.diff} \hlkwb{<-} \hldef{mu0} \hlopt{+} \hldef{delta.diff}
+\hlcom{#p-values}
+\hldef{(far.p} \hlkwb{=} \hlkwd{mean}\hldef{(far.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hlkwd{mean}\hldef{(far.vec)))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(close.p} \hlkwb{=} \hlkwd{mean}\hldef{(close.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hlkwd{mean}\hldef{(close.vec)))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.p} \hlkwb{=} \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{low.diff)} \hlopt{+} \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{high.diff))}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
   \item Compute the randomization confidence interval by iterating over values of $\mu_0$.\\
   \textbf{Hint:} You can ``search" for the lower bound from $Q_1$ and subtracting by 0.0001, 
   and the upper bound using $Q_3$ and increasing by 0.0001. You will continue until you find 
   the first value for which the two-sided $p$-value is greater than or equal to 0.05.
+
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
