@@ -198,19 +198,19 @@ sampling distribution of the $T$ statistic:
 \hlkwd{mean}\hldef{(resamples.null.far)}
 \end{alltt}
 \begin{verbatim}
-## [1] 1.896719e-16
+## [1] 4.799938e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.close)}
 \end{alltt}
 \begin{verbatim}
-## [1] -2.878142e-16
+## [1] -5.931033e-16
 \end{verbatim}
 \begin{alltt}
 \hlkwd{mean}\hldef{(resamples.null.diff)}
 \end{alltt}
 \begin{verbatim}
-## [1] -5.224154e-17
+## [1] 1.362466e-16
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -253,21 +253,21 @@ As you can see, the p-values for all three tests are zero. For the t-tests, the 
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.667138
+## -1.674054
 \end{verbatim}
 \begin{alltt}
 \hldef{(close.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.close,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.596498
+## -1.594521
 \end{verbatim}
 \begin{alltt}
 \hldef{(diff.5th.percentile} \hlkwb{=} \hlkwd{quantile}\hldef{(resamples.null.diff,} \hlnum{0.05}\hldef{))}
 \end{alltt}
 \begin{verbatim}
 ##        5% 
-## -1.556945
+## -1.562238
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -290,7 +290,7 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.far.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] -0.2629412 -0.1597044
+## [1] -0.2630417 -0.1593101
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.close} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= close.vec,}
@@ -301,7 +301,7 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.close.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.1215654 0.1937632
+## [1] 0.1219668 0.1944105
 \end{verbatim}
 \begin{alltt}
 \hldef{boots.diff} \hlkwb{<-} \hlkwd{boot}\hldef{(}\hlkwc{data} \hldef{= diff.vec,}
@@ -312,7 +312,7 @@ The first thing I notice here is that these values are all relatively close to t
 \hldef{boot.diff.ci}\hlopt{$}\hldef{bca[}\hlnum{4}\hlopt{:}\hlnum{5}\hldef{]}
 \end{alltt}
 \begin{verbatim}
-## [1] 0.2849256 0.4485000
+## [1] 0.2852404 0.4500516
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -358,6 +358,7 @@ for the closer, further, and difference data, so perform the randomization proce
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+Here there was no shifting to do because mu0 is zero, so all there was to do was shuffle each data vector by randomly multiplying by 1 and -1. I then stored the mean of each shuffled data. We can now use these shuffled means to find the p-values.
   \item Compute the randomization test $p$-value for each test.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -386,11 +387,174 @@ for the closer, further, and difference data, so perform the randomization proce
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+Again, the p-values are zero for all three tests. Just like for the bootstrapping test, this is because the magnitude of the test statistics are too large for any observation under the assumption of the null to be more extreme.
   \item Compute the randomization confidence interval by iterating over values of $\mu_0$.\\
   \textbf{Hint:} You can ``search" for the lower bound from $Q_1$ and subtracting by 0.0001, 
   and the upper bound using $Q_3$ and increasing by 0.0001. You will continue until you find 
   the first value for which the two-sided $p$-value is greater than or equal to 0.05.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hldef{mu0} \hlkwb{=} \hlnum{0}
+\hldef{R} \hlkwb{<-} \hlnum{1000}
+\hldef{mu0.iterate} \hlkwb{<-} \hlnum{0.0001}
 
+\hldef{far.mu.lower} \hlkwb{<-} \hlkwd{quantile}\hldef{(far.vec,} \hlnum{0.25}\hldef{)}
+\hldef{close.mu.lower} \hlkwb{<-} \hlkwd{quantile}\hldef{(close.vec,} \hlnum{0.25}\hldef{)}
+\hldef{diff.mu.lower} \hlkwb{<-} \hlkwd{quantile}\hldef{(diff.vec,} \hlnum{0.25}\hldef{)}
+\hlkwa{repeat}\hldef{\{}
+  \hldef{far.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+  \hldef{close.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+  \hldef{diff.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+
+  \hlcom{# PREPROCESSING: shift the data to be mean 0 under H0}
+  \hldef{far.shift} \hlkwb{<-} \hldef{far.vec} \hlopt{-} \hldef{far.mu.lower}
+  \hldef{close.shift} \hlkwb{<-} \hldef{close.vec} \hlopt{-} \hldef{close.mu.lower}
+  \hldef{diff.shift} \hlkwb{<-} \hldef{diff.vec} \hlopt{-} \hldef{diff.mu.lower}
+  \hlcom{# RANDOMIZE / SHUFFLE}
+  \hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+    \hldef{far.curr.rand} \hlkwb{<-} \hldef{far.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(far.shift),}
+             \hlkwc{replace} \hldef{= T)}
+    \hldef{close.curr.rand} \hlkwb{<-} \hldef{close.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(close.shift),}
+             \hlkwc{replace} \hldef{= T)}
+    \hldef{diff.curr.rand} \hlkwb{<-} \hldef{diff.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(diff.shift),}
+             \hlkwc{replace} \hldef{= T)}
+
+    \hldef{far.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(far.curr.rand)}
+    \hldef{close.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(close.curr.rand)}
+    \hldef{diff.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(diff.curr.rand)}
+  \hldef{\}}
+  \hldef{far.rand} \hlkwb{<-} \hldef{far.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{far.mu.lower)} \hlcom{# shifting back}
+  \hldef{close.rand} \hlkwb{<-} \hldef{close.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{close.mu.lower)} \hlcom{# shifting back}
+  \hldef{diff.rand} \hlkwb{<-} \hldef{diff.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{diff.mu.lower)} \hlcom{# shifting back}
+  \hlcom{# p-value }
+  \hldef{far.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(far.vec)} \hlopt{-} \hldef{far.mu.lower)}
+  \hldef{close.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(close.vec)} \hlopt{-} \hldef{close.mu.lower)}
+  \hldef{diff.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(diff.vec)} \hlopt{-} \hldef{diff.mu.lower)}
+  \hldef{far.low} \hlkwb{<-} \hldef{far.mu.lower} \hlopt{-} \hldef{far.delta}
+  \hldef{close.low} \hlkwb{<-} \hldef{close.mu.lower} \hlopt{-} \hldef{close.delta}
+  \hldef{diff.low} \hlkwb{<-} \hldef{diff.mu.lower} \hlopt{-} \hldef{diff.delta}
+  \hldef{far.high}\hlkwb{<-} \hldef{far.mu.lower} \hlopt{+} \hldef{far.delta}
+  \hldef{close.high}\hlkwb{<-} \hldef{close.mu.lower} \hlopt{+} \hldef{close.delta}
+  \hldef{diff.high}\hlkwb{<-} \hldef{diff.mu.lower} \hlopt{+} \hldef{diff.delta}
+  \hldef{far.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(far.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{far.low)} \hlopt{+}
+      \hlkwd{mean}\hldef{(far.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{far.high)}
+  \hldef{close.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(close.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{close.low)} \hlopt{+}
+    \hlkwd{mean}\hldef{(close.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{close.high)}
+  \hldef{diff.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{diff.low)} \hlopt{+}
+    \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{diff.high)}
+  \hlkwa{if}\hldef{(diff.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{diff.mu.lower} \hlkwb{<-} \hldef{diff.mu.lower} \hlopt{+} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{(close.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{close.mu.lower} \hlkwb{<-} \hldef{close.mu.lower} \hlopt{+} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{(far.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{far.mu.lower} \hlkwb{<-} \hldef{far.mu.lower} \hlopt{+} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{((diff.p.val}\hlopt{>}\hlnum{0.05}\hldef{)} \hlopt{&} \hldef{(close.p.val}\hlopt{>}\hlnum{0.05}\hldef{)} \hlopt{&} \hldef{(far.p.val}\hlopt{>}\hlnum{0.05}\hldef{))\{}
+    \hlkwa{break}
+  \hldef{\}}
+\hldef{\}}
+
+\hldef{far.mu.upper} \hlkwb{<-} \hlkwd{quantile}\hldef{(far.vec,} \hlnum{0.75}\hldef{)}
+\hldef{close.mu.upper} \hlkwb{<-} \hlkwd{quantile}\hldef{(close.vec,} \hlnum{0.75}\hldef{)}
+\hldef{diff.mu.upper} \hlkwb{<-} \hlkwd{quantile}\hldef{(diff.vec,} \hlnum{0.75}\hldef{)}
+\hlkwa{repeat}\hldef{\{}
+  \hldef{far.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+  \hldef{close.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+  \hldef{diff.rand} \hlkwb{<-} \hlkwd{tibble}\hldef{(}\hlkwc{xbars} \hldef{=} \hlkwd{rep}\hldef{(}\hlnum{NA}\hldef{, R))}
+
+  \hlcom{# PREPROCESSING: shift the data to be mean 0 under H0}
+  \hldef{far.shift} \hlkwb{<-} \hldef{far.vec} \hlopt{-} \hldef{far.mu.upper}
+  \hldef{close.shift} \hlkwb{<-} \hldef{close.vec} \hlopt{-} \hldef{close.mu.upper}
+  \hldef{diff.shift} \hlkwb{<-} \hldef{diff.vec} \hlopt{-} \hldef{diff.mu.upper}
+  \hlcom{# RANDOMIZE / SHUFFLE}
+  \hlkwa{for}\hldef{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hldef{R)\{}
+    \hldef{far.curr.rand} \hlkwb{<-} \hldef{far.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(far.shift),}
+             \hlkwc{replace} \hldef{= T)}
+    \hldef{close.curr.rand} \hlkwb{<-} \hldef{close.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(close.shift),}
+             \hlkwc{replace} \hldef{= T)}
+    \hldef{diff.curr.rand} \hlkwb{<-} \hldef{diff.shift} \hlopt{*}
+      \hlkwd{sample}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{c}\hldef{(}\hlopt{-}\hlnum{1}\hldef{,} \hlnum{1}\hldef{),}
+             \hlkwc{size} \hldef{=} \hlkwd{length}\hldef{(diff.shift),}
+             \hlkwc{replace} \hldef{= T)}
+
+    \hldef{far.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(far.curr.rand)}
+    \hldef{close.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(close.curr.rand)}
+    \hldef{diff.rand}\hlopt{$}\hldef{xbars[i]} \hlkwb{<-} \hlkwd{mean}\hldef{(diff.curr.rand)}
+  \hldef{\}}
+  \hldef{far.rand} \hlkwb{<-} \hldef{far.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{far.mu.upper)} \hlcom{# shifting back}
+  \hldef{close.rand} \hlkwb{<-} \hldef{close.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{close.mu.upper)} \hlcom{# shifting back}
+  \hldef{diff.rand} \hlkwb{<-} \hldef{diff.rand |>}
+    \hlkwd{mutate}\hldef{(}\hlkwc{xbars} \hldef{= xbars} \hlopt{+} \hldef{diff.mu.upper)} \hlcom{# shifting back}
+  \hlcom{# p-value }
+  \hldef{far.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(far.vec)} \hlopt{-} \hldef{far.mu.upper)}
+  \hldef{close.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(close.vec)} \hlopt{-} \hldef{close.mu.upper)}
+  \hldef{diff.delta} \hlkwb{<-} \hlkwd{abs}\hldef{(}\hlkwd{mean}\hldef{(diff.vec)} \hlopt{-} \hldef{diff.mu.upper)}
+  \hldef{far.low} \hlkwb{<-} \hldef{far.mu.upper} \hlopt{-} \hldef{far.delta}
+  \hldef{close.low} \hlkwb{<-} \hldef{close.mu.upper} \hlopt{-} \hldef{close.delta}
+  \hldef{diff.low} \hlkwb{<-} \hldef{diff.mu.upper} \hlopt{-} \hldef{diff.delta}
+  \hldef{far.high}\hlkwb{<-} \hldef{far.mu.upper} \hlopt{+} \hldef{far.delta}
+  \hldef{close.high}\hlkwb{<-} \hldef{close.mu.upper} \hlopt{+} \hldef{close.delta}
+  \hldef{diff.high}\hlkwb{<-} \hldef{diff.mu.upper} \hlopt{+} \hldef{diff.delta}
+  \hldef{far.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(far.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{far.low)} \hlopt{+}
+    \hlkwd{mean}\hldef{(far.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{far.high)}
+  \hldef{close.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(close.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{close.low)} \hlopt{+}
+    \hlkwd{mean}\hldef{(close.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{close.high)}
+  \hldef{diff.p.val} \hlkwb{<-} \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{<=} \hldef{diff.low)} \hlopt{+}
+    \hlkwd{mean}\hldef{(diff.rand}\hlopt{$}\hldef{xbars} \hlopt{>=} \hldef{diff.high)}
+  \hlkwa{if}\hldef{(diff.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{diff.mu.upper} \hlkwb{<-} \hldef{diff.mu.upper} \hlopt{-} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{(close.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{close.mu.upper} \hlkwb{<-} \hldef{close.mu.upper} \hlopt{-} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{(far.p.val} \hlopt{<} \hlnum{0.05}\hldef{)\{}
+    \hldef{far.mu.upper} \hlkwb{<-} \hldef{far.mu.upper} \hlopt{-} \hldef{mu0.iterate}
+  \hldef{\}}
+  \hlkwa{if}\hldef{((diff.p.val}\hlopt{>}\hlnum{0.05}\hldef{)} \hlopt{&} \hldef{(close.p.val}\hlopt{>}\hlnum{0.05}\hldef{)} \hlopt{&} \hldef{(far.p.val}\hlopt{>}\hlnum{0.05}\hldef{))\{}
+    \hlkwa{break}
+  \hldef{\}}
+\hldef{\}}
+\hldef{(far.ci} \hlkwb{=} \hlkwd{c}\hldef{(far.mu.lower, far.mu.upper))}
+\end{alltt}
+\begin{verbatim}
+##        25%        75% 
+## -0.2595606 -0.1467054
+\end{verbatim}
+\begin{alltt}
+\hldef{(close.ci} \hlkwb{=} \hlkwd{c}\hldef{(close.mu.lower, close.mu.upper))}
+\end{alltt}
+\begin{verbatim}
+##      25%      75% 
+## 0.119518 0.192770
+\end{verbatim}
+\begin{alltt}
+\hldef{(diff.ci} \hlkwb{=} \hlkwd{c}\hldef{(diff.mu.lower, diff.mu.upper))}
+\end{alltt}
+\begin{verbatim}
+##       25%       75% 
+## 0.2740407 0.4459148
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+We again can see that the confidence intervals are very similar to the corresponding t-test confidence intervals
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

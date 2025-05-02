@@ -144,6 +144,147 @@ high.diff <- mu0 + delta.diff
 (close.p = mean(close.rand$xbars >= mean(close.vec)))
 (diff.p = mean(diff.rand$xbars <= low.diff) + mean(diff.rand$xbars >= high.diff))
 
+#part c: confidence interval
+mu0 = 0
+R <- 1000
+mu0.iterate <- 0.0001
+
+far.mu.lower <- quantile(far.vec, 0.25)
+close.mu.lower <- quantile(close.vec, 0.25)
+diff.mu.lower <- quantile(diff.vec, 0.25)
+repeat{
+  far.rand <- tibble(xbars = rep(NA, R))
+  close.rand <- tibble(xbars = rep(NA, R))
+  diff.rand <- tibble(xbars = rep(NA, R))
+  
+  # PREPROCESSING: shift the data to be mean 0 under H0
+  far.shift <- far.vec - far.mu.lower
+  close.shift <- close.vec - close.mu.lower
+  diff.shift <- diff.vec - diff.mu.lower
+  # RANDOMIZE / SHUFFLE
+  for(i in 1:R){
+    far.curr.rand <- far.shift *
+      sample(x = c(-1, 1),
+             size = length(far.shift),
+             replace = T)
+    close.curr.rand <- close.shift *
+      sample(x = c(-1, 1),
+             size = length(close.shift),
+             replace = T)
+    diff.curr.rand <- diff.shift *
+      sample(x = c(-1, 1),
+             size = length(diff.shift),
+             replace = T)
+    
+    far.rand$xbars[i] <- mean(far.curr.rand)
+    close.rand$xbars[i] <- mean(close.curr.rand)
+    diff.rand$xbars[i] <- mean(diff.curr.rand)
+  }
+  far.rand <- far.rand |>
+    mutate(xbars = xbars + far.mu.lower) # shifting back
+  close.rand <- close.rand |>
+    mutate(xbars = xbars + close.mu.lower) # shifting back
+  diff.rand <- diff.rand |>
+    mutate(xbars = xbars + diff.mu.lower) # shifting back
+  # p-value 
+  far.delta <- abs(mean(far.vec) - far.mu.lower)
+  close.delta <- abs(mean(close.vec) - close.mu.lower)
+  diff.delta <- abs(mean(diff.vec) - diff.mu.lower)
+  far.low <- far.mu.lower - far.delta
+  close.low <- close.mu.lower - close.delta
+  diff.low <- diff.mu.lower - diff.delta
+  far.high<- far.mu.lower + far.delta
+  close.high<- close.mu.lower + close.delta
+  diff.high<- diff.mu.lower + diff.delta
+  far.p.val <- mean(far.rand$xbars <= far.low) +
+      mean(far.rand$xbars >= far.high)
+  close.p.val <- mean(close.rand$xbars <= close.low) +
+    mean(close.rand$xbars >= close.high)
+  diff.p.val <- mean(diff.rand$xbars <= diff.low) +
+    mean(diff.rand$xbars >= diff.high)
+  if(diff.p.val < 0.05){
+    diff.mu.lower <- diff.mu.lower + mu0.iterate
+  }
+  if(close.p.val < 0.05){
+    close.mu.lower <- close.mu.lower + mu0.iterate
+  }
+  if(far.p.val < 0.05){
+    far.mu.lower <- far.mu.lower + mu0.iterate
+  }
+  if((diff.p.val>0.05) & (close.p.val>0.05) & (far.p.val>0.05)){
+    break
+  }
+}
+
+far.mu.upper <- quantile(far.vec, 0.75)
+close.mu.upper <- quantile(close.vec, 0.75)
+diff.mu.upper <- quantile(diff.vec, 0.75)
+repeat{
+  far.rand <- tibble(xbars = rep(NA, R))
+  close.rand <- tibble(xbars = rep(NA, R))
+  diff.rand <- tibble(xbars = rep(NA, R))
+  
+  # PREPROCESSING: shift the data to be mean 0 under H0
+  far.shift <- far.vec - far.mu.upper
+  close.shift <- close.vec - close.mu.upper
+  diff.shift <- diff.vec - diff.mu.upper
+  # RANDOMIZE / SHUFFLE
+  for(i in 1:R){
+    far.curr.rand <- far.shift *
+      sample(x = c(-1, 1),
+             size = length(far.shift),
+             replace = T)
+    close.curr.rand <- close.shift *
+      sample(x = c(-1, 1),
+             size = length(close.shift),
+             replace = T)
+    diff.curr.rand <- diff.shift *
+      sample(x = c(-1, 1),
+             size = length(diff.shift),
+             replace = T)
+    
+    far.rand$xbars[i] <- mean(far.curr.rand)
+    close.rand$xbars[i] <- mean(close.curr.rand)
+    diff.rand$xbars[i] <- mean(diff.curr.rand)
+  }
+  far.rand <- far.rand |>
+    mutate(xbars = xbars + far.mu.upper) # shifting back
+  close.rand <- close.rand |>
+    mutate(xbars = xbars + close.mu.upper) # shifting back
+  diff.rand <- diff.rand |>
+    mutate(xbars = xbars + diff.mu.upper) # shifting back
+  # p-value 
+  far.delta <- abs(mean(far.vec) - far.mu.upper)
+  close.delta <- abs(mean(close.vec) - close.mu.upper)
+  diff.delta <- abs(mean(diff.vec) - diff.mu.upper)
+  far.low <- far.mu.upper - far.delta
+  close.low <- close.mu.upper - close.delta
+  diff.low <- diff.mu.upper - diff.delta
+  far.high<- far.mu.upper + far.delta
+  close.high<- close.mu.upper + close.delta
+  diff.high<- diff.mu.upper + diff.delta
+  far.p.val <- mean(far.rand$xbars <= far.low) +
+    mean(far.rand$xbars >= far.high)
+  close.p.val <- mean(close.rand$xbars <= close.low) +
+    mean(close.rand$xbars >= close.high)
+  diff.p.val <- mean(diff.rand$xbars <= diff.low) +
+    mean(diff.rand$xbars >= diff.high)
+  if(diff.p.val < 0.05){
+    diff.mu.upper <- diff.mu.upper - mu0.iterate
+  }
+  if(close.p.val < 0.05){
+    close.mu.upper <- close.mu.upper - mu0.iterate
+  }
+  if(far.p.val < 0.05){
+    far.mu.upper <- far.mu.upper - mu0.iterate
+  }
+  if((diff.p.val>0.05) & (close.p.val>0.05) & (far.p.val>0.05)){
+    break
+  }
+}
+(far.ci = c(far.mu.lower, far.mu.upper))
+(close.ci = c(close.mu.lower, close.mu.upper))
+(diff.ci = c(diff.mu.lower, diff.mu.upper))
 
 
 
